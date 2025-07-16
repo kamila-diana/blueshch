@@ -1,6 +1,11 @@
 from django.shortcuts import redirect
 from django.http import HttpResponse
 from .spotify_auth import get_auth_url, exchange_code_for_token
+from .spotify_metadata import find_devices
+from .spotify_player import play_song
+
+TOKEN = "TO_BE_SETUP"
+
 
 def login(request):
     auth_url = get_auth_url(request)
@@ -21,5 +26,25 @@ def callback(request):
     
     # Print token in terminal for demonstration
     print("\nSpotify Access Token:", token_info['access_token'])
-    
+
+    global TOKEN
+    TOKEN = token_info['access_token']
+
     return HttpResponse("Authentication successful! Check your terminal for the access token.")
+
+
+def play(request):
+    track_uri = "spotify:track:0iHZAp0Vxgvr0NjexVWkxy"
+    response = play_song(TOKEN, track_uri)
+    if response.status_code == 204:
+        return HttpResponse("Enjoy the song!")
+    else:
+        return HttpResponse(f"Couldn't play the song")
+
+
+def devices(request):
+    response = find_devices(TOKEN)
+    if response.status_code == 200:
+        return HttpResponse("OK")
+    else:
+        return HttpResponse("Something is no yes.")
