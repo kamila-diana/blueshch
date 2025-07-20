@@ -1,4 +1,4 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from .spotify_auth import get_auth_url, exchange_code_for_token
 from .spotify_metadata import find_devices
@@ -6,6 +6,8 @@ from .spotify_player import play_song
 
 TOKEN = "TO_BE_SETUP"
 
+def hello(request):
+    return render(request, "main.html")
 
 def login(request):
     auth_url = get_auth_url(request)
