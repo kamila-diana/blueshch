@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spotify Search</title>
+    <script>
+    let timeout = null;
+    function searchSpotify(immediate=false) {
+        clearTimeout(timeout);
+        if (immediate) {
+            doSearch();
+        } else {
+            timeout = setTimeout(doSearch, 500);
+        }
+    }
+    function doSearch() {
+        const query = document.getElementById('searchbar').value;
+        if (!query) {
+            document.getElementById('results').innerHTML = '';
+            return;
+        }
+        fetch('/search_api/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.results) {
+                let html = '<table border="1"><tr><th>Name</th><th>Artist</th><th>Album</th><th>URI</th></tr>';
+                for (const row of data.results) {
+                    html += `<tr><td>${row.name}</td><td>${row.artist}</td><td>${row.album}</td><td>${row.uri}</td></tr>`;
+                }
+                html += '</table>';
+                document.getElementById('results').innerHTML = html;
+            } else if (data.error) {
+                document.getElementById('results').innerHTML = '<b>' + data.error + '</b>';
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+    <h1>Spotify Search</h1>
+    <input type="text" id="searchbar" onkeyup="searchSpotify(event.key === 'Enter')" placeholder="Type to search for songs..." autocomplete="off" />
+    <div id="results"></div>
+</body>
+</html>

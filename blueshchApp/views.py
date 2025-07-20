@@ -1,8 +1,10 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from .spotify_auth import get_auth_url, exchange_code_for_token
 from .spotify_metadata import find_devices
 from .spotify_player import play_song
+from .spotify_search import search_song
 
 TOKEN = "TO_BE_SETUP"
 
@@ -50,3 +52,31 @@ def devices(request):
         return HttpResponse("OK")
     else:
         return HttpResponse("Something is no yes.")
+
+def search(request):
+    return render(request, "search.html")
+
+@csrf_exempt
+def search_api(request):
+    if request.method == "POST":
+        import json
+        data = json.loads(request.body)
+        query = data.get("query", "")
+        token = globals().get("TOKEN", "")
+        if not token or token == "TO_BE_SETUP":
+            return JsonResponse({"error": "Not authenticated with Spotify."}, status=401)
+        if not query:
+            return JsonResponse({"results": []})
+        results = search_song(query, token)
+        tracks = results.get("tracks", {}).get("items", [])
+        table = [
+            {
+                "name": t["name"],
+                "artist": ", ".join(a["name"] for a in t["artists"]),
+                "album": t["album"]["name"],
+                "uri": t["uri"]
+            }
+            for t in tracks
+        ]
+        return JsonResponse({"results": table})
+    return JsonResponse({"error": "Invalid request."}, status=400)
