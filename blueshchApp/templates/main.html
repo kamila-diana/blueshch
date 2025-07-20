@@ -1,13 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blueshch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1 style="color:MediumSeaGreen;">Welcome to Blueshch!</h1>
-    <a href="http://127.0.0.1:8000/login">Click to login</a>
+<body class="bg-gradient-to-b from-green-500 to-green-700 text-white min-h-screen flex flex-col justify-center items-center">
+
+  <div class="text-center p-6">
+    <h1 class="text-4xl font-bold mb-4">Welcome to Blueshch!</h1>
+    <p class="text-lg mb-8">Login to spotify and vote for your favorite songs! 🎶</p>
+
+    <a href="/login/" class="inline-block bg-white text-green-600 font-semibold px-6 py-3 rounded-xl shadow-lg hover:bg-gray-100 transition duration-200">
+      🔐 Login to Spotify
+    </a>
+  </div>
+
+  <footer class="absolute bottom-4 text-sm text-white/80">
+    &copy; 2025 Blueshch
+  </footer>
 
 </body>
 </html>
