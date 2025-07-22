@@ -1,12 +1,15 @@
-from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+
+from .models import Token
 from .spotify_auth import get_auth_url, exchange_code_for_token
 from .spotify_metadata import find_devices
 from .spotify_player import play_song
 from .spotify_search import search_song
 
-TOKEN = "TO_BE_SETUP"
+TOKEN = Token(user_id="user", access_token=None, expires_at=None)
 
 def hello(request):
     return render(request, "main.html")
@@ -32,14 +35,15 @@ def callback(request):
     print("\nSpotify Access Token:", token_info['access_token'])
 
     global TOKEN
-    TOKEN = token_info['access_token']
+
+    TOKEN.update(token_info['access_token'], timezone.now())
 
     return HttpResponse("Authentication successful! Check your terminal for the access token.")
 
 
 def play(request):
     track_uri = "spotify:track:0iHZAp0Vxgvr0NjexVWkxy"
-    response = play_song(TOKEN, track_uri)
+    response = play_song(TOKEN.get_access_token(), track_uri)
     if response.status_code == 204:
         return HttpResponse("Enjoy the song!")
     else:
@@ -47,7 +51,7 @@ def play(request):
 
 
 def devices(request):
-    response = find_devices(TOKEN)
+    response = find_devices(TOKEN.get_access_token())
     if response.status_code == 200:
         return HttpResponse("OK")
     else:
