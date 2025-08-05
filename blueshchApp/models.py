@@ -20,6 +20,8 @@ class Token(models.Model):
         self.expires_at = expires_at
 
     def get_access_token(self):
-        if self.is_expired():
+        if not self.access_token:
+            raise ValueError("Access token is not set yet")
+        elif self.is_expired():
             raise ValueError("Token is expired")
         return self.access_token

@@ -66,9 +66,11 @@ def search_api(request):
         import json
         data = json.loads(request.body)
         query = data.get("query", "")
-        token = globals().get("TOKEN", "")
-        if not token or token == "TO_BE_SETUP":
-            return JsonResponse({"error": "Not authenticated with Spotify."}, status=401)
+        try:
+            token = TOKEN.get_access_token()
+        except ValueError as e:
+            print(f"Error getting access token: {e}")
+            return JsonResponse({"error": "Error getting access token"}, status=401)
         if len(query) > 100:
             return JsonResponse({"error": "Query too long."}, status=400)
         if not query:
