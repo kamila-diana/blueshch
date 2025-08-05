@@ -18,6 +18,7 @@ class Token(models.Model):
         token_life = timezone.timedelta(seconds=3600)
         expires_at = requested_at + token_life
         self.expires_at = expires_at
+        self.save()
 
     def get_access_token(self):
         if not self.access_token:
